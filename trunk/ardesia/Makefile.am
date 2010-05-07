@@ -1,0 +1,54 @@
+## Process this file with automake to produce Makefile.in
+## Created by Anjuta
+
+SUBDIRS = src po
+
+ardesiadocdir = ${prefix}/doc/ardesia
+ardesiadoc_DATA = \
+	README\
+	COPYING\
+	AUTHORS\
+	ChangeLog\
+	INSTALL\
+	NEWS
+
+desktopdir = $(datadir)/applications
+desktop_in_files = applications/ardesia.desktop.in
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
+@INTLTOOL_DESKTOP_RULE@
+
+pixmapdir = $(datadir)/pixmaps
+pixmap_DATA = pixmaps/ardesia.png
+
+INTLTOOL_FILES = intltool-extract.in \
+	intltool-merge.in \
+	intltool-update.in
+
+EXTRA_DIST = $(ardesiadoc_DATA) \
+	$(INTLTOOL_FILES)
+
+DISTCLEANFILES = intltool-extract \
+	intltool-merge \
+	intltool-update \
+	po/.intltool-merge-cache
+
+deb:
+	debuild -us -uc -b
+
+clean:
+	@for i in $(SUBDIRS); do \
+        echo "Clearing in $$i..."; \
+        (cd $$i; $(MAKE) clean); done
+	rm -f  applications/ardesia.desktop
+	rm -fr debian/tmp
+	rm -fr debian/files
+	rm -fr debian/ardesia
+	rm -f  debian/debhelper.log
+	rm -fr debian/substvars
+	rm -f  ardesia/config.log
+
+# Remove doc directory on uninstall
+uninstall-local:
+	rm -fr $(ardesiadocdir)
+	rm -fr $(uidir)
+	rm -fr $(datadir)/ardesia
